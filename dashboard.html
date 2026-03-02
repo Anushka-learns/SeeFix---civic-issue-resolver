@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Civic Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-900 text-gray-200">
+
+<div class="max-w-7xl mx-auto mt-10 px-4">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-emerald-400">
+            Smart Civic Reporting Dashboard
+        </h1>
+        <span class="text-sm text-gray-400">
+            AI-Powered Municipal Monitoring
+        </span>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-slate-800 p-6 rounded-lg shadow">
+            <h2 class="text-gray-400 text-sm">Total Complaints</h2>
+            <p class="text-2xl font-bold text-white">{{ reports|length }}</p>
+        </div>
+
+        <div class="bg-slate-800 p-6 rounded-lg shadow">
+            <h2 class="text-gray-400 text-sm">Pending Issues</h2>
+            <p class="text-2xl font-bold text-red-400">
+                {{ reports | selectattr(6, 'equalto', 'Pending') | list | length }}
+            </p>
+        </div>
+
+        <div class="bg-slate-800 p-6 rounded-lg shadow">
+            <h2 class="text-gray-400 text-sm">Resolved</h2>
+            <p class="text-2xl font-bold text-green-400">
+                {{ reports | selectattr(6, 'equalto', 'Resolved') | list | length }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-slate-800 shadow-lg rounded-lg p-6 overflow-x-auto">
+
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-slate-700 text-gray-300">
+                    <th class="p-3">ID</th>
+                    <th class="p-3">Image</th>
+                    <th class="p-3">Issue</th>
+                    <th class="p-3">Location</th>
+                    <th class="p-3">Date</th>
+                    <th class="p-3">Time</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for report in reports %}
+                <tr class="border-b border-slate-700 text-center hover:bg-slate-700 transition">
+
+                    <td class="p-3">{{ report[0] }}</td>
+
+                    <td class="p-3">
+                        <img src="{{ report[1] }}" width="100"
+                             class="mx-auto rounded-lg border border-slate-600">
+                    </td>
+
+                    <td class="p-3 font-semibold text-emerald-300">
+                        {{ report[2] }}
+                    </td>
+
+                    <td class="p-3">{{ report[3] }}</td>
+                    <td class="p-3">{{ report[4] }}</td>
+                    <td class="p-3">{{ report[5] }}</td>
+
+                    <td class="p-3">
+                        {% if report[6] == "Resolved" %}
+                        <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs">
+                            Resolved
+                        </span>
+                        {% else %}
+                        <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs">
+                            Pending
+                        </span>
+                        {% endif %}
+                    </td>
+
+                    <td class="p-3">
+                        {% if report[6] != "Resolved" and session['role'] == 'admin' %}
+                        <a href="/resolve/{{ report[0] }}"
+                           class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-1 rounded transition">
+                           Mark Resolved
+                        </a>
+                        {% else %}
+                        <span class="text-gray-400">Completed</span>
+                        {% endif %}
+                    </td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-8 text-gray-500 text-sm">
+        Built by Anushka • AI Smart City Project
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/" class="text-emerald-400 hover:underline">
+            ← Back to Complaint Upload
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>
