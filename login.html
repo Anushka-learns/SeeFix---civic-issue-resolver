@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SeeFix Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-900 text-gray-200">
+
+<div class="max-w-md mx-auto mt-24 bg-slate-800 p-10 rounded-xl shadow-lg text-center">
+
+    <!-- Header -->
+    <h1 class="text-2xl font-bold text-emerald-400 mb-2">
+        Welcome to SeeFix
+    </h1>
+
+    <p class="text-gray-400 mb-8">
+        Choose how you want to access the civic reporting system
+    </p>
+
+    <!-- Login Form -->
+    <form action="/login" method="post" class="space-y-5">
+
+        <div>
+            <label class="block mb-2 text-sm text-gray-300 font-semibold">
+                Select Role
+            </label>
+
+            <select name="role"
+                    class="w-full p-3 rounded bg-slate-700 border border-slate-600 focus:outline-none focus:border-emerald-400">
+                <option value="user">Citizen / User</option>
+                <option value="admin">Municipal Admin</option>
+            </select>
+        </div>
+
+        <button class="w-full bg-emerald-500 text-white p-3 rounded-lg font-semibold hover:bg-emerald-600 transition">
+            Continue
+        </button>
+
+    </form>
+
+    <!-- Info Section -->
+    <div class="mt-8 grid grid-cols-2 gap-4 text-sm">
+
+        <div class="bg-slate-700 p-3 rounded">
+            👤 Report issues(User)
+        </div>
+
+        <div class="bg-slate-700 p-3 rounded">
+            🏛 Manage complaints(Admin)
+        </div>
+
+    </div>
+
+    <!-- Back -->
+    <div class="mt-8">
+        <a href="/" class="text-emerald-400 hover:underline">
+            ← Back to Home
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-6 text-gray-500 text-xs">
+        AI Smart City Project • SeeFix
+    </div>
+
+</div>
+
+</body>
+</html>
