@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SeeFix - Choose Role</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-text-gray-200">
+
+<div class="flex items-center justify-center h-screen">
+
+    <div class="bg-slate-900 text-gray-200 p-10 rounded-xl shadow text-center">
+
+        <h1 class="emerland-400 text-4xl font-bold mb-3">
+            Welcome to SeeFix
+        </h1>
+
+        <p class="text-gray-100 mb-6">
+            Choose how you want to continue
+        </p>
+
+        <form action="/select-role" method="post">
+
+            <button name="role" value="user"
+                class="emerland-400 text-2xl font-bold mb-3 w-full bg-emerald-500 text-white p-3 rounded hover:bg-emerald-600">
+                 User
+            </button>
+
+            <button name="role" value="admin"
+                class="emerland-400 text-2xl font-bold mb-3 w-full bg-emerald-500 text-white p-3 rounded hover:bg-emerald-600">
+                 Municipal Admin
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
