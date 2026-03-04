@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Detection Result • SeeFix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-900 text-gray-200">
+
+<div class="max-w-2xl mx-auto mt-16 bg-slate-800 p-10 rounded-xl shadow-lg text-center">
+
+    <!-- Title -->
+    <h1 class="text-3xl font-bold text-emerald-400 mb-3">
+        AI Analysis Complete
+    </h1>
+
+    <p class="text-gray-400 mb-8">
+        The system analyzed the uploaded image and identified the issue below.
+    </p>
+
+    <!-- Complaint Info -->
+    <div class="bg-slate-700 p-6 rounded-lg mb-6 text-left space-y-2">
+        <p><b>Complaint ID:</b> {{ complaint_id }}</p>
+        <p><b>Detected Issue:</b> {{ prediction }}</p>
+        <p>
+            <b>AI Urgency Level:</b>
+            <span class="text-yellow-400 font-semibold">
+                {{ urgency }}
+            </span>
+        </p>
+        <p>
+            <b>Severity Score:</b>
+            <span class="text-emerald-400 font-semibold">
+                {{ severity_score }}
+            </span>
+        </p>
+    </div>
+
+    <!-- Result Highlight -->
+    <div class="bg-slate-700 p-6 rounded-lg mb-8">
+        <p class="text-sm text-gray-400 mb-2">Detected Issue</p>
+        <p class="text-2xl font-bold text-emerald-300">
+            {{ prediction }}
+        </p>
+    </div>
+
+    <!-- Image -->
+    <div class="mb-8">
+       <img src="{{ url_for('uploaded_file', filename=image.split('/')[-1]) }}"
+             class="mx-auto rounded-lg shadow border border-slate-600"
+             width="350">
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex justify-center gap-4">
+
+        <a href="/upload_page"
+           class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-lg transition">
+           Upload Another
+        </a>
+
+        <a href="/user_dashboard"
+           class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-lg transition">
+           Go to Dashboard
+        </a>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 text-gray-500 text-sm">
+        SeeFix • AI Smart Civic Monitoring System
+    </div>
+
+</div>
+
+</body>
+</html>
