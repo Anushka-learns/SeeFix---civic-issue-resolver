@@ -1,92 +1,157 @@
-import sqlite3
-import uuid
-from flask import Flask, render_template, request,redirect,session
+from flask import Flask, render_template, request, redirect, session
 import os
+import sqlite3
 from predict import predict_image
-from database import save_report
-from database import init_db
+from database import save_report, get_reports, init_db
+from flask import send_from_directory
 
 app = Flask(__name__)
+app.secret_key = "seefix_secret"
 
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
+# ---------------- ROLE SELECTION ----------------
 @app.route("/")
-def home():
-    return render_template("login.html")
-
-@app.route("/")
-def index():
-    return render_template("index.html")
+def role_page():
+    return render_template("role.html")
 
 
-@app.route("/upload", methods=["POST"])
+@app.route("/select-role", methods=["POST"])
+def select_role():
+    session["selected_role"] = request.form["role"]
+    return redirect("/login")
+
+
+# ---------------- LOGIN ----------------
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    username = request.form["username"]
+    password = request.form["password"]
+
+    selected_role = session.get("selected_role")
+
+    if not selected_role:
+        return redirect("/")
+
+    conn = sqlite3.connect("seefix.db")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT role FROM users WHERE username=? AND password=?",
+        (username, password),
+    )
+
+    user = cursor.fetchone()
+    conn.close()
+
+    if user:
+        actual_role = user[0]
+
+        if actual_role != selected_role:
+            return "Wrong role selected."
+
+        session["username"] = username
+        session["role"] = actual_role
+
+        if actual_role == "admin":
+            return redirect("/admin_dashboard")
+        else:
+            return redirect("/user_dashboard")
+
+    return "Invalid login"
+
+
+# ---------------- USER DASHBOARD ----------------
+@app.route("/user_dashboard")
+def user_dashboard():
+    if session.get("role") != "user":
+        return redirect("/")
+    return render_template("user_dashboard.html")
+
+
+# Upload page
+@app.route("/upload_page")
+def upload_page():
+    if session.get("role") != "user":
+        return redirect("/")
+    return render_template("upload.html")
+
+
+# ---------------- ADMIN DASHBOARD ----------------
+@app.route("/admin_dashboard")
+def admin_dashboard():
+    if session.get("role") != "admin":
+        return redirect("/")
+
+    reports = get_reports()
+    return render_template("admin_dashboard.html", reports=reports)
+
+
+# ---------------- UPLOAD COMPLAINT ----------------
 @app.route("/upload", methods=["POST"])
 def upload():
+    if "image" not in request.files:
+        return "No file uploaded"
+
     file = request.files["image"]
-    address = request.form["address"]
 
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
-    file.save(filepath)
+    if file.filename == "":
+        return "No selected file"
 
-    prediction = predict_image(filepath)
+    # Save image
+    file_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+    file.save(file_path)
 
-    save_report(filepath, prediction, address)
-    complaint_id = "CIV-" + str(uuid.uuid4())[:8]
+    # Run AI prediction
+    prediction, urgency, severity_score = predict_image(file_path)
 
-    return render_template("result.html", prediction=prediction, image=filepath)
+    # Save to database
+    complaint_id = save_report(
+        prediction,
+        urgency,
+        severity_score,
+        file_path
+    )
 
-@app.route("/dashboard")
-def dashboard():
-    from database import get_reports
-    reports = get_reports()
-    return render_template("dashboard.html", reports=reports)
+    return render_template(
+        "result.html",
+        prediction=prediction,
+        urgency=urgency,
+        severity_score=severity_score,
+        complaint_id=complaint_id,
+        image="/" + file_path
+    )
 
-@app.route("/resolve/<int:id>")
-def resolve(id):
+# ---------------- RESOLVE COMPLAINT ----------------
+@app.route("/resolve/<int:report_id>")
+def resolve(report_id):
     if session.get("role") != "admin":
-        return "Access Denied"
+        return redirect("/")
 
-    conn = sqlite3.connect("database.db")
+    conn = sqlite3.connect("seefix.db")
     cursor = conn.cursor()
-    cursor.execute("UPDATE reports SET status='Resolved' WHERE id=?", (id,))
+    cursor.execute("UPDATE reports SET status='Resolved' WHERE id=?", (report_id,))
     conn.commit()
     conn.close()
 
-    return redirect("/dashboard")
-@app.route("/login", methods=["POST"])
-def login():
-    role = request.form["role"]
-    session["role"] = role
-
-    if role == "admin":
-        return redirect("/admin-dashboard")
-    else:
-        return redirect("/user-dashboard")
+    return redirect("/admin_dashboard")
 
 
-@app.route("/login", methods=["POST"])
-def login_user():
-    role = request.form["role"]
+# ---------------- LOGOUT ----------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
 
-    if role == "admin":
-        return redirect("/dashboard")
-    else:
-        return redirect("/")
-    
-@app.route("/user-dashboard")
-def user_dashboard():
-    return render_template("upload.html")
-
-@app.route("/admin-dashboard")
-def admin_dashboard():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM reports")
-    reports = cursor.fetchall()
-    conn.close()
-
-    return render_template("dashboard.html", reports=reports)
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 if __name__ == "__main__":
