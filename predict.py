@@ -1,24 +1,46 @@
-# Import libraries
-import tensorflow as tf
 import numpy as np
+from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import os
 
-# Load trained model
-model = tf.keras.models.load_model("pothole_model.h5")
+# Load model
+MODEL_PATH = "pothole_model.h5"
+model = load_model(MODEL_PATH)
 
-# Class names (same order as dataset folders)
-class_names = ["garbage", "normal", "potholes"]
+# Classes
+class_names = ["garbage", "normal", "pothole"]
 
-# Load image for testing
-img_path = "1.jpg"  # put any pothole or garbage image here
 
-img = image.load_img(img_path, target_size=(224, 224))
-img_array = image.img_to_array(img)
-img_array = np.expand_dims(img_array, axis=0)
-img_array = img_array / 255.0
+def predict_image(img_path):
+    try:
+        img = image.load_img(img_path, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)
+        img_array = img_array / 255.0
 
-# Predict
-prediction = model.predict(img_array)
-predicted_class = class_names[np.argmax(prediction)]
+        prediction = model.predict(img_array)
 
-print("Prediction:", predicted_class)
+        if prediction is None or len(prediction) == 0:
+            return "unknown", "Low", 0.0
+
+        class_index = np.argmax(prediction)
+        confidence = float(np.max(prediction))
+
+        if class_index >= len(class_names):
+            label = "unknown"
+        else:
+           label = class_names[class_index]
+
+ # AI severity logic
+        if confidence > 0.8:
+            severity = "High"
+        elif confidence > 0.5:
+            severity = "Medium"
+        else:
+            severity = "Low"
+
+        return label, severity, round(confidence * 100, 2)
+
+    except Exception as e:
+        print("Prediction Error:", e)
+        return "unknown", "Low", 0.0
