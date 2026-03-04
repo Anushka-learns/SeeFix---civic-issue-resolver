@@ -28,7 +28,60 @@
 
             <button name="role" value="admin"
                 class="emerland-400 text-2xl font-bold mb-3 w-full bg-emerald-500 text-white p-3 rounded hover:bg-emerald-600">
-                 Municipal Admin
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>SeeFix - Choose Role</title>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+                    <style>
+                        body {
+                            perspective: 1000px;
+                            background: linear-gradient(135deg, #2e4160 0%, #0f172a 100%);
+                            font-family: 'Inter', sans-serif;
+                        }
+                        .bg-3d {
+                            transform: rotateX(5deg) rotateY(-5deg);
+                            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+                        }
+                    </style>
+                </head>
+
+                <body class="bg-slate-900 text-gray-200">
+
+                <div class="flex items-center justify-center h-screen">
+
+                    <div class="bg-3d bg-slate-900 text-gray-200 p-10 rounded-xl shadow text-center">
+
+                        <h1 class="text-emerald-400 text-4xl font-bold mb-3">
+                            Welcome to SeeFix
+                        </h1>
+
+                        <p class="text-gray-100 mb-6">
+                            Choose how you want to continue
+                        </p>
+
+                        <form action="/select-role" method="post">
+
+                            <button name="role" value="user"
+                                class="text-2xl font-bold mb-3 w-full bg-emerald-500 text-black p-3 rounded-lg hover:bg-emerald-600">
+                                 User
+                            </button>
+
+                            <button name="role" value="admin"
+                                class="text-2xl font-bold mb-3 w-full bg-emerald-500 text-black p-3 rounded-lg hover:bg-emerald-600">
+                                 Municipal Admin
+                            </button>
+
+                        </form>
+
+                    </div>
+                    
+
+                </div>
+
+                </body>
+                </html>
             </button>
 
         </form>
