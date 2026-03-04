@@ -2,5 +2,4 @@ flask
 numpy
 tensorflow
 pillow
-sqlite3
 gunicorn
