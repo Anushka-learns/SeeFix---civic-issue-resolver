@@ -1,5 +1,6 @@
-flask
-numpy
 tensorflow==2.15.0
-pillow
 gunicorn
+flask
+numpy==1.26.4
+
+pillow
