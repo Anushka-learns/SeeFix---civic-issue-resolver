@@ -1,11 +1,10 @@
 import numpy as np
-from tensorflow.keras.models import load_model
+import tensorflow as tf
 from tensorflow.keras.preprocessing import image
-import os
 
-# Load model
+# Load model once
 MODEL_PATH = "pothole_model.h5"
-model = load_model(MODEL_PATH)
+model = tf.keras.models.load_model(MODEL_PATH)
 
 # Classes
 class_names = ["garbage", "normal", "pothole"]
@@ -29,9 +28,9 @@ def predict_image(img_path):
         if class_index >= len(class_names):
             label = "unknown"
         else:
-           label = class_names[class_index]
+            label = class_names[class_index]
 
- # AI severity logic
+        # AI severity logic
         if confidence > 0.8:
             severity = "High"
         elif confidence > 0.5:
