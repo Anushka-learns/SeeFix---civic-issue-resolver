@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, send_from_directory
 import os
 import sqlite3
 from predict import predict_image
 from database import save_report, get_reports, init_db
-from flask import send_from_directory
 
 app = Flask(__name__)
 app.secret_key = "seefix_secret"
@@ -11,7 +10,6 @@ app.secret_key = "seefix_secret"
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 
 # ---------------- ROLE SELECTION ----------------
 @app.route("/")
@@ -33,7 +31,6 @@ def login():
 
     username = request.form["username"]
     password = request.form["password"]
-
     selected_role = session.get("selected_role")
 
     if not selected_role:
@@ -41,18 +38,15 @@ def login():
 
     conn = sqlite3.connect("seefix.db")
     cursor = conn.cursor()
-
     cursor.execute(
         "SELECT role FROM users WHERE username=? AND password=?",
         (username, password),
     )
-
     user = cursor.fetchone()
     conn.close()
 
     if user:
         actual_role = user[0]
-
         if actual_role != selected_role:
             return "Wrong role selected."
 
@@ -75,7 +69,6 @@ def user_dashboard():
     return render_template("user_dashboard.html")
 
 
-# Upload page
 @app.route("/upload_page")
 def upload_page():
     if session.get("role") != "user":
@@ -100,7 +93,6 @@ def upload():
         return "No file uploaded"
 
     file = request.files["image"]
-
     if file.filename == "":
         return "No selected file"
 
@@ -128,6 +120,7 @@ def upload():
         image="/" + file_path
     )
 
+
 # ---------------- RESOLVE COMPLAINT ----------------
 @app.route("/resolve/<int:report_id>")
 def resolve(report_id):
@@ -149,11 +142,12 @@ def logout():
     session.clear()
     return redirect("/")
 
-@app.route('/uploads/<filename>')
+
+@app.route("/uploads/<filename>")
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
-if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
+# ---------------- INITIALIZE DATABASE ----------------
+# This ensures DB is ready without blocking Gunicorn workers
+init_db()
