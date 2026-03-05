@@ -1,6 +1,5 @@
-tensorflow==2.15.0
-gunicorn
+tensorflow-cpu==2.15.0
+numpy==1.24.4
 flask
-numpy==1.26.4
-
+gunicorn
 pillow
