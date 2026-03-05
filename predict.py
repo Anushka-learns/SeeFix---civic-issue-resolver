@@ -45,3 +45,4 @@ def predict_image(img_path):
         return "unknown", "Low", 0.0
 
 
+
