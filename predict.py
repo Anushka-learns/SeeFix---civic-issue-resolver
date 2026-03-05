@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.preprocessing import image
+image=tf.keras.preprocessing.image
 
 # Load model once
 MODEL_PATH = "pothole_model.h5"
@@ -43,3 +43,4 @@ def predict_image(img_path):
     except Exception as e:
         print("Prediction Error:", e)
         return "unknown", "Low", 0.0
+
