@@ -1,19 +1,16 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.models import load_model
 import os
 
 MODEL_PATH = "pothole_model.h5"
-model = load_model(MODEL_PATH)
+model = tf.keras.models.load_model(MODEL_PATH)
 
 class_names = ["garbage", "normal", "pothole"]
 
-
 def predict_image(img_path):
     try:
-        img = image.load_img(img_path, target_size=(224, 224))
-        img_array = image.img_to_array(img)
+        img = tf.keras.preprocessing.image.load_img(img_path, target_size=(224, 224))
+        img_array = tf.keras.preprocessing.image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = img_array / 255.0
 
@@ -30,7 +27,6 @@ def predict_image(img_path):
         else:
             label = class_names[class_index]
 
-        # AI severity logic
         if confidence > 0.8:
             severity = "High"
         elif confidence > 0.5:
@@ -43,6 +39,7 @@ def predict_image(img_path):
     except Exception as e:
         print("Prediction Error:", e)
         return "unknown", "Low", 0.0
+
 
 
 
